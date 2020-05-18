@@ -246,19 +246,19 @@ if __name__ == '__main__':
 
     points={}
     
-    for x in range(len(xedges)):
-        for y in range(len(yedges)): 
-#             print(tuple(grid_coordinate[x][y]))
-            for key,linevalue in lines.items():
-#                 print(key,linevalue)
-                if linevalue.checkpoint(grid_coordinate[x][y]):
-                    if tuple(grid_coordinate[x][y]) in points.keys():
-#                         print('exist')
-                        points[tuple(grid_coordinate[x][y])].add(key)
-                    else:
-                        points[tuple(grid_coordinate[x][y])]={key}
-                else:
-                    pass
+#     for x in range(len(xedges)):
+#         for y in range(len(yedges)): 
+# #             print(tuple(grid_coordinate[x][y]))
+#             for key,linevalue in lines.items():
+# #                 print(key,linevalue)
+#                 if linevalue.checkpoint(grid_coordinate[x][y]):
+#                     if tuple(grid_coordinate[x][y]) in points.keys():
+# #                         print('exist')
+#                         points[tuple(grid_coordinate[x][y])].add(key)
+#                     else:
+#                         points[tuple(grid_coordinate[x][y])]={key}
+#                 else:
+#                     pass
         
 #     for key,pointvalue in points.items():            
 #         print(key,len(pointvalue))
