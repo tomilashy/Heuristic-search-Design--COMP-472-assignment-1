@@ -87,101 +87,102 @@ class line(object):
             return tuple(self.p1 )
         
     def __isPassable__(self):
-        if self.weight == 1:
-            return True
+        if self.weight == 1000:
+            return False
         elif self.weight == 1.3:
             return True
         elif self.weight == 1.5:
             return True  
-        elif self.weight == 1000:
-            return False  
+        elif self.weight == 1:
+            return True 
         else:
             return False
 
 
     def set_Weight(self,weight):
-        if self.passable:
-            self.weight=weight
-            self.passable=self.__isPassable__()
-#        
-# def lowest_node(nodes,points,lines):
-#     nodes=list(nodes) 
-#     smallest_node = {'node':nodes[0],'weight':20000}
-#     for line in points[smallest_node['node']]:
-#         if lines[line].passable:
-#             if lines[line].weight< smallest_node['weight']:
-#                 smallest_node['weight']=lines[line].weight
-#                  
-#     for node in nodes:
-#         for line in points[node]:
-#             if lines[line].passable:
-#                 print(lines[line].passable)
-#                 if lines[line].weight< smallest_node['weight']:
-#                     smallest_node['node']=node
-#                     smallest_node['weight']=lines[line].weight
-#  
-#     return smallest_node['node']
-#                  
-# def heuristics(start_point,end_point,lines,points):
-#     g_values={tuple(start_point ): {'weight':0,'previous':None,'fvalue':0}}
-#     open_set={tuple(start_point )}
-#     closed_set=[]
-#     h_value = lambda a , b: math.sqrt(((a[0]+b[0])**2)+ ((a[1]+b[1])**2))  
-#     while len(open_set) >0:
-# #         This operation can occur in O(1) time if openSet is a min-heap or a priority queue
-#         current = lowest_node(open_set,points,lines)
-#         if current == tuple(end_point ):
-# #             find the path
-#             path={current}
-#             draw=[]
-#             temp=current 
-#             
-#             while g_values[temp]['previous']:
-#                 new_line=tuple([temp,g_values[temp]['previous']])
-#                 invnew_line=tuple([g_values[temp]['previous'],temp])
-#                 if  new_line in lines.keys(): 
-#                     lines[ new_line].set_Weight(0)
-#                 elif invnew_line in lines.keys():
-#                     lines[invnew_line].set_Weight(0)
-#                 path.add(temp)
-#                 draw.append(new_line)
-#                 temp = g_values[temp]['previous']
-#             print(path)
-# #             for line in path:
-# #             for line in draw:
-# #                 print(line)
-# #                 line_x = np.linspace(line[0][0], line[1][0])
-# #                 line_y = np.linspace(line[0][1], line[1][1])
-# #                 plt.plot(line_x, line_y, color=[0, 1, 0])   
-#             return ('Path found')
-#  
-#         open_set.remove(current) 
-#         closed_set.append(current)
-#         for line_key in points[current]:
-#             if lines[line_key].neighbour(current) in closed_set:
-#                 continue
-#             else:
-#                 tempH=g_values[current]['weight'] + lines[line_key].weight
-#                 if lines[line_key].neighbour(current) in open_set: #if its already in open set, checking if f(n) is better
-#                     if g_values[lines[line_key].neighbour(current)]['weight']<=tempH:
-#                         g_values[lines[line_key].neighbour(current)]['weight']=tempH
-#                         g_values[lines[line_key].neighbour(current)]['previous']=current
-# #                         print('better')
-#                 else:
-#                     open_set.add(lines[line_key].neighbour(current))
-# #                     print(tempH)
-#                     g_values[lines[line_key].neighbour(current)]={'weight': tempH ,'previous':current}
-#                  
-#                  
-# #             f(n):= g(n) + h(n)
-# #                 print(g_values[lines[line_key].neighbour(current)])
-#                 g_values[lines[line_key].neighbour(current)]['fvalue']= h_value(lines[line_key].neighbour(current),end_point)+g_values[lines[line_key].neighbour(current)]['weight']
-#                  
-#  
-#  
-#  
-#     # Open set is empty but goal was never reached
-#     return 'failed to get a path'
+        self.weight=weight
+        self.passable=self.__isPassable__()
+        
+def lowest_node(nodes,points,lines):
+    nodes=list(nodes) 
+    smallest_node = {'node':nodes[0],'weight':20000}
+    for line in points[smallest_node['node']]:
+        if lines[line].passable:
+            if lines[line].weight< smallest_node['weight']:
+                smallest_node['weight']=lines[line].weight
+                  
+    for node in nodes:
+        for line in points[node]:
+            if lines[line].passable:
+                if lines[line].weight< smallest_node['weight']:
+                    smallest_node['node']=node
+                    smallest_node['weight']=lines[line].weight
+  
+    return smallest_node['node']
+def construct_path(current,g_values):
+    #             find the path
+    path={current}
+    draw=[]
+    temp=current 
+     
+    while g_values[temp]['previous']:
+        new_line=tuple([temp,g_values[temp]['previous']])
+        invnew_line=tuple([g_values[temp]['previous'],temp])
+        if  new_line in lines.keys(): 
+            lines[ new_line].set_Weight(0)
+        elif invnew_line in lines.keys():
+            lines[invnew_line].set_Weight(0)
+        path.add(temp)
+        draw.append(new_line)
+        temp = g_values[temp]['previous']
+    print(path)
+#             for line in path:
+#             for line in draw:
+#                 print(line)
+#                 line_x = np.linspace(line[0][0], line[1][0])
+#                 line_y = np.linspace(line[0][1], line[1][1])
+#                 plt.plot(line_x, line_y, color=[0, 1, 0])   
+    return ('Path found')                
+
+def heuristics(start_point,end_point,lines,points):
+    g_values={tuple(start_point ): {'weight':0,'previous':None,'fvalue':0}}
+    open_set={tuple(start_point )}
+    closed_set=[]
+    h_value = lambda a , b: math.sqrt(((a[0]+b[0])**2)+ ((a[1]+b[1])**2))  
+    while len(open_set) >0:
+#         This operation can occur in O(1) time if openSet is a min-heap or a priority queue
+        current = lowest_node(open_set,points,lines)
+        if current == tuple(end_point ):
+            return construct_path(current,g_values)
+  
+        open_set.remove(current) 
+        closed_set.append(current)
+        for line_key in points[current]:
+            if lines[line_key].passable:
+                if lines[line_key].neighbour(current) in closed_set:
+                    continue
+                else:
+                    tempH= lines[line_key].weight #+ g_values[current]['weight'] 
+                    if lines[line_key].neighbour(current) in open_set: #if its already in open set, checking if f(n) is better
+                        if g_values[lines[line_key].neighbour(current)]['fvalue']>=h_value(lines[line_key].neighbour(current),end_point)+tempH:#g_values[lines[line_key].neighbour(current)]['weight']>=tempH:
+                            g_values[lines[line_key].neighbour(current)]['weight']=tempH
+                            g_values[lines[line_key].neighbour(current)]['previous']=current
+    #                         print('better')
+                    else:
+                        open_set.add(lines[line_key].neighbour(current))
+    #                     print(tempH)
+                        g_values[lines[line_key].neighbour(current)]={'weight': tempH ,'previous':current}
+                      
+                      
+    #             f(n):= g(n) + h(n)
+    #                 print(g_values[lines[line_key].neighbour(current)])
+                    g_values[lines[line_key].neighbour(current)]['fvalue']= h_value(lines[line_key].neighbour(current),end_point)+g_values[lines[line_key].neighbour(current)]['weight']
+                  
+  
+  
+  
+    # Open set is empty but goal was never reached
+    return 'failed to get a path'
      
 if __name__ == '__main__':
     sf = shapefile.Reader("shape/crime_dt.shp")
@@ -246,19 +247,19 @@ if __name__ == '__main__':
 
     points={}
     
-#     for x in range(len(xedges)):
-#         for y in range(len(yedges)): 
-# #             print(tuple(grid_coordinate[x][y]))
-#             for key,linevalue in lines.items():
-# #                 print(key,linevalue)
-#                 if linevalue.checkpoint(grid_coordinate[x][y]):
-#                     if tuple(grid_coordinate[x][y]) in points.keys():
-# #                         print('exist')
-#                         points[tuple(grid_coordinate[x][y])].add(key)
-#                     else:
-#                         points[tuple(grid_coordinate[x][y])]={key}
-#                 else:
-#                     pass
+    for x in range(len(xedges)):
+        for y in range(len(yedges)): 
+#             print(tuple(grid_coordinate[x][y]))
+            for key,linevalue in lines.items():
+#                 print(key,linevalue)
+                if linevalue.checkpoint(grid_coordinate[x][y]):
+                    if tuple(grid_coordinate[x][y]) in points.keys():
+#                         print('exist')
+                        points[tuple(grid_coordinate[x][y])].add(key)
+                    else:
+                        points[tuple(grid_coordinate[x][y])]={key}
+                else:
+                    pass
         
 #     for key,pointvalue in points.items():            
 #         print(key,len(pointvalue))
@@ -284,7 +285,7 @@ if __name__ == '__main__':
     plt.scatter (xedges[x2_index[0]][0], yedges[y2_index[0]][0])
 
     start_time = time.time()
-#     print(heuristics(start_point,end_point,lines,points))
+    print(heuristics(start_point,end_point,lines,points))
                     
     '''
     Final part for plotting
@@ -299,14 +300,16 @@ if __name__ == '__main__':
             '''
             uncomment lines below to see them coloured. line was commented out due to added 3.5 secs to time 
             '''
-        elif line.weight == 1:
-            plt.plot(line_x, line_y, color='#00aeff')    
-        elif line.weight == 1.3 :
-            plt.plot(line_x, line_y, color='#ff00f7')
-        elif line.weight == 1.5:
-            plt.plot(line_x, line_y, color='#ffa600')   
-        else:
-            plt.plot(line_x, line_y, color=[1, 0, 0])
+#         elif line.weight == 1:
+#             plt.plot(line_x, line_y, color='#00aeff')    
+#         elif line.weight == 1.3 :
+#             plt.plot(line_x, line_y, color='#ffffff')
+#         elif line.weight == 1.5:
+#             plt.plot(line_x, line_y, color='#ffa600')   
+#         elif not line.passable:
+#             plt.plot(line_x, line_y, color=[1, 0, 0])   
+#         else:
+#             plt.plot(line_x, line_y, color=[1, 0, 0])
             
          
 #     print(grid_coordinate[8][16],temp[8][16])
@@ -319,7 +322,7 @@ if __name__ == '__main__':
     a = mpatches.Patch(color=[1, 0, 0], label='Blocked path')
     b = mpatches.Patch(color=[0, 1, 0], label='Optimal path')
     c = mpatches.Patch(color='#00aeff', label='1.0 weighted lines')
-    d = mpatches.Patch(color='#ff00f7', label='1.3 weighted lines')
+    d = mpatches.Patch(color='#ffffff', label='1.3 weighted lines')#ff00f7
     e = mpatches.Patch(color='#ffa600', label='1.5 weighted lines')
     plt.legend(handles=[a,b,c,d,e], loc='center left', bbox_to_anchor=(1, 0.5))
       
