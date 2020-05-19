@@ -65,7 +65,17 @@ class line(object):
         self.p2=p2
         self.weight=weight
         self.passable=self.__isPassable__()
+    def is_boundaryline(self,a):
+        if bool(set(a).intersection(set(self.p1))) and bool(set(a).intersection(set(self.p2))):
+            return True
+        else:
+            return False
         
+    def is_diagonal(self): 
+        if format(abs(self.p1[0] -self.p2[0]), '.1g') == format(abs(self.p1[1] -self.p2[1]), '.1g'):
+            return True
+        else:
+            return False
     def get_coordinate(self):
         return [self.p1,self.p2]
     
@@ -135,7 +145,7 @@ def construct_path(current,g_values):
         path.add(temp)
         draw.append(new_line)
         temp = g_values[temp]['previous']
-    print(path)
+#     print(path)
 #             for line in path:
 #             for line in draw:
 #                 print(line)
@@ -148,7 +158,8 @@ def heuristics(start_point,end_point,lines,points):
     g_values={tuple(start_point ): {'weight':0,'previous':None,'fvalue':0}}
     open_set={tuple(start_point )}
     closed_set=[]
-    h_value = lambda a , b: math.sqrt(((a[0]+b[0])**2)+ ((a[1]+b[1])**2))  
+#     h_value = lambda a , b: math.sqrt(((a[0]+b[0])**2)+ ((a[1]+b[1])**2)) 
+    h_value = lambda a , b: abs(a[0]-b[0])+ abs(a[1]-b[1])
     while len(open_set) >0:
 #         This operation can occur in O(1) time if openSet is a min-heap or a priority queue
         current = lowest_node(open_set,points,lines)
@@ -164,7 +175,7 @@ def heuristics(start_point,end_point,lines,points):
                 else:
                     tempH= lines[line_key].weight #+ g_values[current]['weight'] 
                     if lines[line_key].neighbour(current) in open_set: #if its already in open set, checking if f(n) is better
-                        if g_values[lines[line_key].neighbour(current)]['fvalue']>=h_value(lines[line_key].neighbour(current),end_point)+tempH:#g_values[lines[line_key].neighbour(current)]['weight']>=tempH:
+                        if g_values[lines[line_key].neighbour(current)]['weight']>=tempH: #g_values[lines[line_key].neighbour(current)]['fvalue']>=h_value(lines[line_key].neighbour(current),end_point)+tempH:
                             g_values[lines[line_key].neighbour(current)]['weight']=tempH
                             g_values[lines[line_key].neighbour(current)]['previous']=current
     #                         print('better')
@@ -223,18 +234,26 @@ if __name__ == '__main__':
         for y in range(len(yedges)-1): 
             temparr.append(grid_box(grid_coordinate[x][y],grid_coordinate[x+1][y],grid_coordinate[x][y+1],grid_coordinate[x+1][y+1],temp[x][y]))
         gridboxes.append(temparr)
-        
-    lines={}
     
+    '''
+    getting all lines on the graph
+    '''     
+    lines={} 
     for i in range(len(gridboxes)):
         for j in range(len(gridboxes[i])):
             for line in gridboxes[i][j].get_all_lines():
                 if tuple(map(tuple, line.get_coordinate())) in lines.keys():
+                    if not line.is_diagonal():
+                        if  line.is_boundaryline([np.max(xedges),np.min(xedges),np.max(yedges),np.min(yedges)]):
+                            line.set_Weight(1000)
 #                     print('already exist')
                     if line.weight!=lines.get(tuple(map(tuple, line.get_coordinate()))).weight and lines[tuple(map(tuple, line.get_coordinate()))].weight!=1.3:
 #                         print(line.weight,lines.get(tuple(map(tuple, line.get_coordinate()))).weight)
                         lines[tuple(map(tuple, line.get_coordinate()))].set_Weight(1.3)
                 elif tuple(map(tuple, line.get_invcoordinate())) in lines.keys() :
+                    if not line.is_diagonal():
+                        if  line.is_boundaryline([np.max(xedges),np.min(xedges),np.max(yedges),np.min(yedges)]):
+                            line.set_Weight(1000)
 #                     print('already exist')
                     if line.weight!=lines[tuple(map(tuple, line.get_invcoordinate()))].weight and lines[tuple(map(tuple, line.get_invcoordinate()))].weight!=1.3:
 #                         print(line.weight,lines.get(tuple(map(tuple, line.get_invcoordinate()))).weight)
@@ -242,11 +261,16 @@ if __name__ == '__main__':
                 else:
 #                     print(tuple(map(tuple, line.get_coordinate())))
                     lines[tuple(map(tuple, line.get_coordinate()))]=line
+                    if not line.is_diagonal():
+                        if  line.is_boundaryline([np.max(xedges),np.min(xedges),np.max(yedges),np.min(yedges)]):
+                            line.set_Weight(1000)
 #                 if not line.passable:
 #                     print(line.get_coordinate(),line.weight,line.passable)
 
+    '''
+    getting all points on the graph
+    ''' 
     points={}
-    
     for x in range(len(xedges)):
         for y in range(len(yedges)): 
 #             print(tuple(grid_coordinate[x][y]))
@@ -260,9 +284,19 @@ if __name__ == '__main__':
                         points[tuple(grid_coordinate[x][y])]={key}
                 else:
                     pass
-        
-#     for key,pointvalue in points.items():            
-#         print(key,len(pointvalue))
+    '''
+    blocking of the boundaries
+    '''    
+    for key,pointvalue in points.items():  
+        if len(pointvalue)<8:
+            for line_key in pointvalue:
+#                 lines[line_key].set_Weight(1000)
+                if not lines[line_key].is_diagonal():
+                    if  lines[line_key].is_boundaryline([np.max(xedges),np.min(xedges),np.max(yedges),np.min(yedges)]):
+#                         lines[line_key].set_Weight(1000)  
+                        print(lines[line_key].passable)    
+                           
+            print(key,len(pointvalue))
 
     '''
     Heuristic Search(check 2.1.5 e & f assignment pdf)
