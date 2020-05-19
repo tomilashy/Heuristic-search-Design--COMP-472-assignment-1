@@ -113,22 +113,34 @@ class line(object):
         self.weight=weight
         self.passable=self.__isPassable__()
         
-def lowest_node(nodes,points,lines):
+def lowest_node(nodes,points,lines,g_values):
     nodes=list(nodes) 
-    smallest_node = {'node':nodes[0],'weight':20000}
-    for line in points[smallest_node['node']]:
-        if lines[line].passable:
-            if lines[line].weight< smallest_node['weight']:
-                smallest_node['weight']=lines[line].weight
+    smallest_node = {'node': nodes[0],'weight':20000}
+    current_node = nodes[0]
+#     for line in points[smallest_node['node']]:
+#         if lines[line].passable:
+#             if lines[line].weight< smallest_node['weight']:
+#                 smallest_node['weight']=lines[line].weight
                   
     for node in nodes:
         for line in points[node]:
             if lines[line].passable:
-                if lines[line].weight< smallest_node['weight']:
+                if lines[line].weight<= smallest_node['weight']:
                     smallest_node['node']=node
                     smallest_node['weight']=lines[line].weight
+                    
+#     for node in nodes:
+#         for line in points[node]:
+#             if lines[line].passable:
+#                 print(line)
+    for  item in nodes:
+#         print(item,current_node,g_values[current_node] )
+        if g_values[item]['fvalue'] < g_values[current_node]['fvalue']:
+            current_node = item
+
+
   
-    return smallest_node['node']
+    return current_node
 def construct_path(current,g_values):
     #             find the path
     path={current}
@@ -158,11 +170,14 @@ def heuristics(start_point,end_point,lines,points):
     g_values={tuple(start_point ): {'weight':0,'previous':None,'fvalue':0}}
     open_set={tuple(start_point )}
     closed_set=[]
-#     h_value = lambda a , b: math.sqrt(((a[0]+b[0])**2)+ ((a[1]+b[1])**2)) 
-    h_value = lambda a , b: abs(a[0]-b[0])+ abs(a[1]-b[1])
+    h_value = lambda a , b: math.sqrt(((a[0]+b[0])**2)+ ((a[1]+b[1])**2)) 
+#     h_value = lambda a , b: abs(a[0]-b[0])+ abs(a[1]-b[1])
     while len(open_set) >0:
 #         This operation can occur in O(1) time if openSet is a min-heap or a priority queue
-        current = lowest_node(open_set,points,lines)
+#         print(len(open_set))
+#         print (lowest_node(open_set,points,lines))
+        current = lowest_node(open_set,points,lines,g_values)
+#         break
         if current == tuple(end_point ):
             return construct_path(current,g_values)
   
@@ -173,9 +188,9 @@ def heuristics(start_point,end_point,lines,points):
                 if lines[line_key].neighbour(current) in closed_set:
                     continue
                 else:
-                    tempH= lines[line_key].weight #+ g_values[current]['weight'] 
+                    tempH= lines[line_key].weight + g_values[current]['weight'] 
                     if lines[line_key].neighbour(current) in open_set: #if its already in open set, checking if f(n) is better
-                        if g_values[lines[line_key].neighbour(current)]['weight']>=tempH: #g_values[lines[line_key].neighbour(current)]['fvalue']>=h_value(lines[line_key].neighbour(current),end_point)+tempH:
+                        if g_values[lines[line_key].neighbour(current)]['weight']>=tempH: #g_values[lines[line_key].neighbour(current)]['fvalue']>=h_value(lines[line_key].neighbour(current),end_point)+tempH: 
                             g_values[lines[line_key].neighbour(current)]['weight']=tempH
                             g_values[lines[line_key].neighbour(current)]['previous']=current
     #                         print('better')
@@ -284,20 +299,9 @@ if __name__ == '__main__':
                         points[tuple(grid_coordinate[x][y])]={key}
                 else:
                     pass
-    '''
-    blocking of the boundaries
-    '''    
-    for key,pointvalue in points.items():  
-        if len(pointvalue)<8:
-            for line_key in pointvalue:
-#                 lines[line_key].set_Weight(1000)
-                if not lines[line_key].is_diagonal():
-                    if  lines[line_key].is_boundaryline([np.max(xedges),np.min(xedges),np.max(yedges),np.min(yedges)]):
-#                         lines[line_key].set_Weight(1000)  
-                        print(lines[line_key].passable)    
-                           
-            print(key,len(pointvalue))
 
+
+    
     '''
     Heuristic Search(check 2.1.5 e & f assignment pdf)
     '''
@@ -340,8 +344,8 @@ if __name__ == '__main__':
 #             plt.plot(line_x, line_y, color='#ffffff')
 #         elif line.weight == 1.5:
 #             plt.plot(line_x, line_y, color='#ffa600')   
-#         elif not line.passable:
-#             plt.plot(line_x, line_y, color=[1, 0, 0])   
+        elif not line.passable:
+            plt.plot(line_x, line_y, color=[1, 0, 0])   
 #         else:
 #             plt.plot(line_x, line_y, color=[1, 0, 0])
             
