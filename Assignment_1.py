@@ -4,7 +4,7 @@ https://pythonhosted.org/Python%20Shapefile%20Library/
 @author: Jesutomi
 ----------------------------------------------------------
 Assignment 1
-written by Olasubulumi Ogo-Oluwa Jesutomi ID:40055693
+written by Olasubulumi Ogo-Oluwa Jesutomi 
 For COMP 472 Section AH?- Summer 2020
 ------------------------------------------------------------
 '''
@@ -13,14 +13,15 @@ import shapefile
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-sf = shapefile.Reader("shape/crime_dt.shp")
+# sf = shapefile.Reader("shape/crime_dt.shp")
+sf = shapefile.Reader("stm_sig/stm_lignes_sig.shp")
 shapes = sf.shapes()
 # print(len(shapes))
 print(dir(shapes[3]))
 # print(shapes[3].shapeType)
 # first feature of the shapefile
 feature = shapes[0]
-first = feature.__geo_interface__  
+first = feature.__geo_interface__['coordinates']  
 print (first)  # (GeoJSON format)
 
 data = np.array([ x.points[0] for x in shapes])  # getting x,y coordinates in a list
